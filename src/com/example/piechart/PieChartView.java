@@ -18,13 +18,13 @@ public class PieChartView extends View {
 
     public static class Block {
 
-        public Block(int color, int weight) {
+        public Block(int color, long weight) {
             this.color = color;
             this.weight = weight;
         }
 
         private int color;
-        private int weight;
+        private long weight;
         private float startAngle;
         private float sweepAngle;
     }
@@ -71,7 +71,7 @@ public class PieChartView extends View {
             }
 
             if (mTotalSweepAngle < 360) {
-                mTotalSweepAngle++;
+                mTotalSweepAngle += mSteps;
                 invalidate();
             }
         }
@@ -80,9 +80,10 @@ public class PieChartView extends View {
     public void setBlocks(Block[] blocks, int highlightBlockIndex) {
         mBlocks = blocks;
         mHighlightBlockIndex = highlightBlockIndex;
+        mTotalSweepAngle = 1;
 
         if (mBlocks != null && mBlocks.length > 0) {
-            int totalWeight = 0;
+            long totalWeight = 0;
             float startAngle = START_ANGLE_OFFSET;
 
             for (int i = 0; i < mBlocks.length; i++) {
@@ -91,10 +92,14 @@ public class PieChartView extends View {
 
             for (int i = 0; i < mBlocks.length; i++) {
                 mBlocks[i].startAngle = startAngle;
-                mBlocks[i].sweepAngle = (float)(360 * mBlocks[i].weight) / totalWeight;
+                mBlocks[i].sweepAngle = (float)((double)(360 * mBlocks[i].weight) / totalWeight);
                 startAngle += mBlocks[i].sweepAngle;
             }
         }
+    }
+
+    public void setSteps(int steps) {
+        mSteps = steps > 0 ? steps : 1;
     }
 
     public void reset() {
@@ -122,6 +127,6 @@ public class PieChartView extends View {
 
     private Block[] mBlocks;
     private int mHighlightBlockIndex = NO_HIGHLIGHT_BLOCK;
-
     private float mTotalSweepAngle = 1;
+    private int mSteps = 1;
 }
